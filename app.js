@@ -5,13 +5,19 @@ const auth = require('./Auth/auth')
 const {hash} = require('./userFuncs/funcs')
 const validator = require('validator')
 
-const client = new Client({
-    host: process.env.PGHOST,
-    user: process.env.PGUSER,
-    port: process.env.PGPORT,
-    password: process.env.PGPASS,
-    database: process.env.PGDB
-})
+// For ElephantSQL
+const ElephSQLConStr = process.env.ESQL_URL
+const client = new Client(ElephSQLConStr)
+
+//For localhost SQL
+
+// const client = new Client({
+//     host: process.env.PGHOST,
+//     user: process.env.PGUSER,
+//     port: process.env.PGPORT,
+//     password: process.env.PGPASS,
+//     database: process.env.PGDB
+// })
 client.connect()
 
 // Creating a database
