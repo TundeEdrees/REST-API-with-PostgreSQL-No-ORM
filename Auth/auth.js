@@ -17,7 +17,7 @@ const auth = async (req, res, next) => {
         const user = await client.query(`SELECT * FROM users WHERE email=$1 AND tokens = $2`,[decoded.pass,[token]])
         // console.log(user.rows[0].tokens)
         if(user.rowCount === 0) {
-            throw Error()
+            throw Error('Issue with authentication')
         }
         req.user = user.rows[0]
         auth_token = token
@@ -25,7 +25,7 @@ const auth = async (req, res, next) => {
     }
     catch(e) {
         console.log(e)
-        res.status(401).send('Authentication Error')
+        res.status(401).send('Authentication Failed')
     }
 }
 

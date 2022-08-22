@@ -17,16 +17,14 @@ client.connect()
 // Creating a database
 const newDb = "CREATE DATABASE no_ORM "
 //Creating a table
-const newTable = "CREATE TABLE IF NOT EXISTS users(name varchar(25) NOT NULL UNIQUE,email varchar(50) NOT NULL UNIQUE, password varchar(100) NOT NULL,phone varchar(20), age INT )"
+const newTable = "CREATE TABLE IF NOT EXISTS users( id SERIAL PRIMARY KEY ,name varchar(25) NOT NULL UNIQUE,email varchar(50) NOT NULL UNIQUE, password varchar(100) NOT NULL,phone varchar(20), age INT , tokens varchar(180))"
 
-// client.query(newTable, (err, res) => {
-//     if(err) {
-//         return console.log(err.message)
-//     }
-//     console.log('Done')
-
-//     client.end()
-// })
+client.query(newTable, (err, res) => {
+    if(err) {
+        return console.log(err.message)
+    }
+    console.log('Done')
+})
 const app = express()
 
 app.use(express.json())
@@ -34,7 +32,6 @@ app.use(express.json())
 const port = process.env.PORT
 
 app.post('/signup', async (req, res) => {
-//    client.query(`INSERT INTO users (name, email, password, phone, age) VALUES(${req.body.name}, ${req.body.email}, ${req.body.password},${req.body.phone},${req.body.age})`)
     try{
         if (validator.isEmail(req.body.email)) {
             console.log('hey')
@@ -81,8 +78,6 @@ app.post('/users/login', async (req, res) => {
             return res.send('Login unsuccessful')
         }
         const token = jwt.sign({pass:req.body.email}, process.env.secret)
-        // const exs_token = await client.query('SELECT tokens FROM users WHERE email=$1',[req.body.email])
-        // const new_tokens = exs_token.rows[0].tokens.concat(token)
         await client.query(`UPDATE users SET  tokens = $1 WHERE email=$2`,[[token],req.body.email])
         const logged_in = await client.query(`SELECT name, email, age FROM users where email = $1`,[req.body.email])
 
@@ -160,35 +155,3 @@ app.delete('/users', auth, async(req, res) => {
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`)
 })
-
-// app.delete('/users/:name', async(req, res) => {
-//     try{
-//         const user = await client.query(`SELECT * FROM users where name = $1`,[req.params.name])
-//         if (user.rowCount === 0) {
-//             console.log('No such user')
-//             return res.send('There is no such user')
-//         }
-//         await client.query(`DELETE FROM users WHERE name = $1`,[req.params.name])
-//         res.status(200).send(user.rows)
-//     }
-//     catch(e) {
-//         console.log(e)
-//     }
-// })
-
-// app.patch('/users/:name', async(req, res) => {
-//     try{
-//         const user = await client.query(`SELECT * FROM users where name = $1`,[req.params.name])
-//         if (user.rowCount === 0){
-//             console.log('No such user to update')
-//             return res.send('No such user to update')
-//         }
-//         const gen_hash = hash(req.body.password)
-//         await client.query(`UPDATE users SET name = $1, email = $2, password = $3, phone = $4, age = $5 WHERE name = $6`,[req.body.name,req.body.email,gen_hash,req.body.phone,req.body.age,req.params.name])
-//         res.status(201).send('updated')
-//     }
-//     catch(e) {
-//         console.log(e.message)
-//         res.send(e.message)
-//     }
-// })
