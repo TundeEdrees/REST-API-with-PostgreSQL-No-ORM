@@ -132,17 +132,16 @@ app.patch('/users/me', auth, async(req, res) => {
 
 app.get('/users/logout', auth, async(req, res) => {
     try{
+        // req.user.tokens = req.user.tokens.filter((token) => {
+        //     return token !== auth_token
+        // })
 
-        req.user.tokens = req.user.tokens.filter((token) => {
-            return token !== auth_token
-        })
-
-        await client.query(`UPDATE users SET name = $1, email = $2, password = $3, phone = $4, age = $5, tokens =$7 WHERE email =$6`,[req.user.name,req.user.email,req.user.password,req.user.phone,req.user.age,req.user.email,req.user.tokens])
+        await client.query(`UPDATE users SET name = $1, email = $2, password = $3, phone = $4, age = $5, tokens =$7 WHERE email =$6`,[req.user.name,req.user.email,req.user.password,req.user.phone,req.user.age,req.user.email,''])
         console.log('User logged out')
         res.status(200).send('Logged out')
     }
     catch(e) {
-        res.staus(401).send(e)
+        res.status(401).send(e)
         console.log(e)
     }
 })
@@ -154,7 +153,7 @@ app.delete('/users', auth, async(req, res) => {
         console.log('Profile deleted')
     }
     catch(e) {
-        res.staus(401).send(e.message)
+        res.status(401).send(e.message)
     }
 })
 
